@@ -144,5 +144,5 @@
     "major_version": 3,
     "minor_version": 5,
     "modules": [],
-    "name": "Logger"
+    "name": "logger"
 }
