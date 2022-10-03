@@ -104,6 +104,24 @@
         variants: ['true', 'false'],
         help: {description: tr('Send an event to the web interface')} }) 
     %>
+    <%= _.template($('#input_constructor').html())({
+        id:"output",
+        description: tr("Destination for logs output"),
+        default_selector: "string",
+        disable_int: true,
+        value_string: 'display + file',
+        variants: ['display + file', 'only display', 'only file', 'none'],
+        help: {description: tr('Send an event to the web interface')} }) 
+    %>
+    <%= _.template($('#input_constructor').html())({
+        id:"logFile",
+        description: tr("Path for the log file"),
+        default_selector: "string",
+        disable_int: true,
+        value_string: 'default',
+        variants: ['default', 'null'],
+        help: {description: tr('Path for the log file')} }) 
+    %>
 </div>
 <div class="tooltipinternal">
     <div class="tr tooltip-paragraph-first-fold">Setup the logger by default</div>  

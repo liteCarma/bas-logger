@@ -8,5 +8,8 @@ logger_settings({
     "warn": (<%= warn %>)
   },
   "webEvent": (<%= webEvent %>),
-  "basInfoOn": (<%= basInfoOn %>)
+  "basInfoOn": (<%= basInfoOn %>),
+  "output": (<%= output %>),
+  "logFile": (<%= logFile %>),
+  
 })

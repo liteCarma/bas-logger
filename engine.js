@@ -30,6 +30,11 @@ logger = {
     this.setLevelColor(obj['color']);
     this.webEvent = obj['webEvent'] === 'true';
     this.basInfoOn = obj['basInfoOn'] === 'true';
+    this.output = obj.output;
+
+    if (obj.logFile !== 'default') {
+      Logger.SetFileName(this.logFile);
+    }
 
     this.eventInterceptor();
     this.threadName =
@@ -51,7 +56,23 @@ logger = {
       this.emit(logData);
     }
 
-    log_html(this.getHTML(logData), this.getText(logData));
+    switch (this.output) {
+      case 'only display': {
+        log_html(this.getHTML(logData));
+        break;
+      }
+      case 'only file': {
+        log_html('', this.getText(logData));
+        break;
+      }
+      case 'none': {
+        log_html('', '');
+        break;
+      }
+      default: {
+        log_html(this.getHTML(logData), this.getText(logData));
+      }
+    }
   },
 
   result: function (obj) {
@@ -107,20 +128,23 @@ logger = {
     var self = this;
     var wrapper = function (context, method, level) {
       return function () {
-        var message = arguments[0]
-        var logData = arguments[arguments.length - 1]
+        var message = arguments[0];
+        var logData = arguments[arguments.length - 1];
 
         if (!(logData instanceof self.CreateLogData)) {
-          logData = new self.CreateLogData({
-            ru: message,
-            en: message,
-          }, {
-            level: level
-          });
+          logData = new self.CreateLogData(
+            {
+              ru: message,
+              en: message,
+            },
+            {
+              level: level,
+            }
+          );
         }
 
         if (!self.basInfoOn && method === '_InfoOrig') {
-          return
+          return;
         }
 
         if (self.webEvent) {
@@ -133,23 +157,34 @@ logger = {
 
     ScriptWorker.Success = wrapper(ScriptWorker, '_SuccessOrig', 'success');
     ScriptWorker.Fail = wrapper(ScriptWorker, '_FaillOrig', 'fail');
-    ScriptWorker.FailInternal = wrapper(ScriptWorker, '_FailInternalOrig' , 'fail');
-    ScriptWorker.FailUser = wrapper(ScriptWorker, '_FailUserOrig' , 'fail');
-    ScriptWorker.Die = wrapper(ScriptWorker, '_DieOrig' , 'fail');
-    ScriptWorker.DieInternal = wrapper(ScriptWorker, '_DieInternalOrig' , 'fail');
-    ScriptWorker.SetFailMessage = wrapper(ScriptWorker, '_SetFailMessageOrig' , 'fail');
-    ScriptWorker.Info = wrapper(ScriptWorker, '_InfoOrig' , 'bas_warn');
+    ScriptWorker.FailInternal = wrapper(
+      ScriptWorker,
+      '_FailInternalOrig',
+      'fail'
+    );
+    ScriptWorker.FailUser = wrapper(ScriptWorker, '_FailUserOrig', 'fail');
+    ScriptWorker.Die = wrapper(ScriptWorker, '_DieOrig', 'fail');
+    ScriptWorker.DieInternal = wrapper(
+      ScriptWorker,
+      '_DieInternalOrig',
+      'fail'
+    );
+    ScriptWorker.SetFailMessage = wrapper(
+      ScriptWorker,
+      '_SetFailMessageOrig',
+      'fail'
+    );
+    ScriptWorker.Info = wrapper(ScriptWorker, '_InfoOrig', 'bas_warn');
   },
 
-
   CreateLogData: function (data, options) {
-    this.thread_name = logger.threadName
-    this.action_id = ScriptWorker.GetCurrentAction()
-    this.date = new Date()
-    this.text = data[logger.lang]
-    this.lang = logger.lang
-    this.ru = data.ru
-    this.en = data.en
+    this.thread_name = logger.threadName;
+    this.action_id = ScriptWorker.GetCurrentAction();
+    this.date = new Date();
+    this.text = data[logger.lang];
+    this.lang = logger.lang;
+    this.ru = data.ru;
+    this.en = data.en;
 
     for (key in options) {
       if (options.hasOwnProperty(key)) {
