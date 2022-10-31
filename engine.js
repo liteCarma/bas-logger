@@ -36,6 +36,10 @@ logger = {
       Logger.SetFileName(this.logFile);
     }
 
+    if (obj.output == 'only display') {
+      Logger.SetFileName(null);
+    }
+
     this.eventInterceptor();
     this.threadName =
       obj['thread_name'] !== ''
