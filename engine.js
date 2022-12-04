@@ -44,7 +44,7 @@ logger = {
     this.threadName =
       obj['thread_name'] !== ''
         ? obj['thread_name']
-        : (lang === 'ru' ? ' Поток №' : ' Thread#') + thread_number();
+        : (lang === 'ru' ? 'Поток №' : 'Thread#') + thread_number();
   },
 
   log: function (obj) {
@@ -107,7 +107,7 @@ logger = {
       color: '#d90000',
     });
 
-    die(logData.text, obj['instantly'], logData);
+    ScriptWorker.Die(logData.text, obj['instantly'], logData);
   },
 
   fail: function (obj) {
@@ -116,7 +116,7 @@ logger = {
       color: '#d90000',
     });
 
-    fail(logData.text, obj['stop'], logData);
+    ScriptWorker.FailUser(logData.text, obj['stop'], logData);
   },
 
   success: function (obj) {
@@ -124,8 +124,7 @@ logger = {
       level: 'success',
       color: '#00dd2d',
     });
-
-    success(logData.text, logData);
+    ScriptWorker.Success(logData.text, logData);
   },
 
   eventInterceptor: function () {
@@ -134,7 +133,6 @@ logger = {
       return function () {
         var message = arguments[0];
         var logData = arguments[arguments.length - 1];
-
         if (!(logData instanceof self.CreateLogData)) {
           logData = new self.CreateLogData(
             {
@@ -228,7 +226,7 @@ logger = {
     var text = '';
     text += this.formatId(data.action_id);
     text += this.getFormattedTime(data.date);
-    return text + data.thread_name + ': ' + data.text;
+    return text + ' ' + data.thread_name + ': ' + data.text;
   },
 
   setLevelColor: function (colors) {
