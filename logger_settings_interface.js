@@ -135,11 +135,14 @@
         <pre>
             { 
               thread_name: 1,   // thread name, the default thread number
-              level: 'info',    // info, warn, success, error, fail, result
-              color: "#ffffff"
               action_id: 162681501,
               date: "2019-10-30T18:46:41.327Z",
-              text:  "message"
+              text: "message",
+              lang: "en",
+              ru: "сообщение",
+              en: "message",
+              level: 'info',    // info, warn, success, error, fail, result
+              color: "#ffffff"
             }
         </pre>
     </div>
