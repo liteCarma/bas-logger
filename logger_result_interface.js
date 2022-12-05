@@ -45,7 +45,7 @@
 		'gray',
 		'black'
 	], 
-	help: {description: tr("Color")} }) 
+	help: {description: tr("Color name or HEX (#0ff574)")} }) 
 %>
 <%= _.template($('#input_constructor').html())({
     id:"formatAsLog", 

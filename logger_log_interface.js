@@ -43,7 +43,7 @@
 			'gray',
 			'black'
         ], 
-        help: {description: tr("Color")} }) 
+        help: {description: tr("Color name or HEX (#0ff574)")} }) 
     %>
 </div>
 <%= _.template($('#back').html())({action:"executeandadd", visible:true}) %>

@@ -101,6 +101,23 @@
       "name": "logger_die",
       "select": "logger_die_select.js",
       "template": "ru: {{ru}}\nen: {{en}}"
+    },
+    {
+      "code": [
+        {
+          "file": "logger_setLogPath_code.js",
+          "name": "logger_setLogPath_code"
+        }
+      ],
+      "description": {
+        "en": "Set path for log",
+        "ru": "Установить путь для лога"
+      },
+      "interface": "logger_setLogPath_interface.js",
+      "is_element": false,
+      "name": "logger_setLogPath",
+      "select": "logger_setLogPath_select.js",
+      "template": "{{logFile}}"
     }
   ],
   "api_version": 1,
@@ -156,11 +173,17 @@
     "Thread name": {
       "ru": "Имя потока"
     },
-    "Show bas informational messages (waiting for element)": {
-      "ru": "Показывать информационные сообщения BAS(ожидание элемента)"
+    "Show msg \"waiting element\"": {
+      "ru": "Показывать сообщение \"ожидание элемента\""
     },
-    "Show bas informational messages": {
-      "ru": "Показывать информационные сообщения BAS"
+    "Show thread name in log": {
+      "ru": "Показывать имя потока в логе"
+    },
+    "Show action id in the log": {
+      "ru": "Показывать id действия в логе"
+    },
+    "Show date in the log": {
+      "ru": "Показывать дату в логе"
     },
     "The message about success": {
       "ru": "Cообщение о успехе"
@@ -177,14 +200,11 @@
     "Terminate the thread with an unsuccessful result.": {
       "ru": "Завершить поток с неуспешным результатом."
     },
-    "Send an event to the web interface": {
-      "ru": "Отправка события в веб-интерфейс"
-    },
     "Format as Log": {
       "ru": "Формат как лог"
     },
-    "The default color for this log level, in hexadecimal format": {
-      "ru": "Цвет по умолчанию для этого уровня журнала, в 16-ом формате"
+    "The default color for this log level, in HEX format": {
+      "ru": "Цвет по умолчанию для этого уровня журнала, HEX формате"
     },
     "Setup the logger by default": {
       "ru": "Настройка логгера по умолчанию"
@@ -192,8 +212,8 @@
     "Language selection mode \"auto\" - language depends on the BAS interface language": {
       "ru": "Режим выбора языка \"авто\" - язык зависит от языка интерфейса BAS"
     },
-    "For each log level you can choose the default color, you can also specify your color in hexadecimal format.": {
-      "ru": "Для каждого уровня журнала вы можете выбрать цвет по умолчанию, вы также можете указать свой цвет в шестнадцатеричном формате."
+    "For each log level you can choose the default color, you can also specify your color in HEX format.": {
+      "ru": "Для каждого уровня журнала вы можете выбрать цвет по умолчанию, вы также можете указать свой цвет в HEX формате."
     },
     "If you enable sending events to the web interface, then the ": {
       "ru": "Если вы включаете отправку событий в веб-интерфейс, то"
@@ -207,15 +227,24 @@
     "This action finishes whole script, not just single thread.": {
       "ru": "Это действие завершает весь скрипт, а не только отдельный поток."
     },
-    "Destination for logs output": {
-      "ru": "Место назначения для вывода журналов"
-    },
     "Path for the log file": {
       "ru": "Путь для файла журналов"
+    },
+    "<b>It is not recommended to use this action.</b>It allows you to change the logging path, if set to null the log will not be saved. This action should be used before the main threads start, e.g. in the onApplicationStart function": {
+      "ru": "Не рекомендуются использовать это действие. Оно позволяет изменить путь для записи журнала, если установить значение null, журнал не будет сохранен. Это действие следует использовать до запуска основных потоков, например в функции onApplicationStart"
+    },
+    "Send an event to the web interface": {
+      "ru": "Отправить событие в веб-интерфейс"
+    },
+    "Recommended icon size 16x16": {
+      "ru": "Рекоммендуемый размер иконки 16x16"
+    },
+    "Color name or HEX (#0ff574)": {
+      "ru": "Название цвета или HEX (#0ff574)"
     }
   },
-  "major_version": 3,
-  "minor_version": 5,
+  "major_version": 4,
+  "minor_version": 0,
   "modules": [],
   "name": "logger"
 }

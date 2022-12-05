@@ -1,15 +1,4 @@
 logger = {
-  lang: _K,
-  icon: '',
-  levelColor: {
-    info: '',
-    error: '#FF0000',
-    warn: '#909399',
-  },
-  webEvent: false,
-  basInfoOn: true,
-  threadName: (_K === 'ru' ? ' Поток №' : ' Thread #') + thread_number(),
-  lastId: null,
   _SuccessOrig: ScriptWorker.Success,
   _FaillOrig: ScriptWorker.Fail,
   _FailInternalOrig: ScriptWorker.FailInternal,
@@ -18,33 +7,44 @@ logger = {
   _DieInternalOrig: ScriptWorker.DieInternal,
   _SetFailMessageOrig: ScriptWorker.SetFailMessage,
   _InfoOrig: ScriptWorker.Info,
-
-  setDefaultSettings: function (obj) {
-    var lang = obj['lang'].toLowerCase();
+  setDefaultSettings: function () {
+    this.lang = _K;
+    this.icon = '';
+    (this.levelColor = {
+      info: '',
+      error: '#FF0000',
+      warn: '#909399',
+    }),
+      (this.threadName =
+        (_K === 'ru' ? 'Поток №' : 'Thread #') + thread_number());
+    this.sendWebEvent = false;
+    this.showWarnAlerts = true;
+    this.showThreadName = true;
+    this.showDate = true;
+    this.showActionID = true;
+    this.lastId = null;
+  },
+  setSettings: function (options) {
+    this.setDefaultSettings();
+    var lang = options.lang.toLowerCase();
 
     if (lang !== 'auto') {
       this.lang = lang;
     }
 
-    this.icon = obj['icon'];
-    this.setLevelColor(obj['color']);
-    this.webEvent = obj['webEvent'] === 'true';
-    this.basInfoOn = obj['basInfoOn'] === 'true';
-    this.output = obj.output;
+    this.icon = options.icon;
+    this.sendWebEvent = options.sendWebEvent;
+    this.showWarnAlerts = options.showWarnAlerts;
+    this.showThreadName = options.showThreadName;
+    this.showActionID = options.showActionID;
+    this.showDate = options.showDate;
 
-    if (obj.logFile !== 'default') {
-      Logger.SetFileName(this.logFile);
+    if (options.threadName !== '') {
+      this.threadName = options.threadName;
     }
 
-    if (obj.output == 'only display') {
-      Logger.SetFileName(null);
-    }
-
+    this.setLevelColor(options.color);
     this.eventInterceptor();
-    this.threadName =
-      obj['thread_name'] !== ''
-        ? obj['thread_name']
-        : (lang === 'ru' ? 'Поток №' : 'Thread#') + thread_number();
   },
 
   log: function (obj) {
@@ -56,27 +56,9 @@ logger = {
           : this.levelColor[obj['level']],
     });
 
-    if (this.webEvent) {
-      this.emit(logData);
-    }
+    this.emit(logData);
 
-    switch (this.output) {
-      case 'only display': {
-        log_html(this.getHTML(logData));
-        break;
-      }
-      case 'only file': {
-        log_html('', this.getText(logData));
-        break;
-      }
-      case 'none': {
-        log_html('', '');
-        break;
-      }
-      default: {
-        log_html(this.getHTML(logData), this.getText(logData));
-      }
-    }
+    log_html(this.getHTML(logData), this.getText(logData));
   },
 
   result: function (obj) {
@@ -86,9 +68,7 @@ logger = {
       tab: obj['number'] || 1,
     });
 
-    if (this.webEvent) {
-      this.emit(logData);
-    }
+    this.emit(logData);
 
     if (obj['formatAsLog'] === 'true') {
       result_html(
@@ -103,7 +83,7 @@ logger = {
 
   die: function (obj) {
     var logData = new this.CreateLogData(obj, {
-      level: 'fail',
+      level: 'die',
       color: '#d90000',
     });
 
@@ -126,7 +106,11 @@ logger = {
     });
     ScriptWorker.Success(logData.text, logData);
   },
-
+  setLogPath: function (obj) {
+    if (obj.logFile === '') return;
+    var path = obj.logFile === 'null' ? null : obj.logFile;
+    Logger.SetFileName(path);
+  },
   eventInterceptor: function () {
     var self = this;
     var wrapper = function (context, method, level) {
@@ -145,14 +129,11 @@ logger = {
           );
         }
 
-        if (!self.basInfoOn && method === '_InfoOrig') {
+        if (!self.showWarnAlerts && method === '_InfoOrig') {
           return;
         }
 
-        if (self.webEvent) {
-          self.emit(logData);
-        }
-
+        self.emit(logData);
         self[method].apply(context, arguments);
       };
     };
@@ -187,6 +168,11 @@ logger = {
     this.lang = logger.lang;
     this.ru = data.ru;
     this.en = data.en;
+    this.icon = logger.icon;
+    this.showWarnAlerts = logger.showWarnAlerts;
+    this.showThreadName = logger.showThreadName;
+    this.showDate = logger.showDate;
+    this.showActionID = logger.showActionID;
 
     for (key in options) {
       if (options.hasOwnProperty(key)) {
@@ -196,29 +182,37 @@ logger = {
   },
 
   getHTML: function (data) {
-    var html = '';
-    html +=
-      '<a style="color:#808080;" href="action://action' +
-      data.action_id +
-      '">' +
-      this.formatId(data.action_id) +
-      '</a>';
+    var html = '<div>';
 
-    html += '<span style="color:' + data.color + ';">';
+    if (this.showActionID) {
+      html +=
+        '<a style="color:#808080;" href="action://action' +
+        data.action_id +
+        '">' +
+        this.formatId(data.action_id) +
+        '</a>';
+    }
 
-    html += ' ' + this.getFormattedTime(data.date);
-
-    html += ' ' + data.thread_name + ' : ';
+    html += '<span style="color:' + data.color + '";>';
+    if (this.showDate) {
+      html += ' ' + this.getFormattedTime(data.date);
+    }
+    if (this.showThreadName) {
+      html += ' ' + data.thread_name + '</span>';
+    }
 
     if (this.icon) {
       html +=
-        ' <img style="vertical-align: middle;" src="data:image/png;base64,' +
-        this.icon +
-        '"/> ';
+        '<span> </span><img src="data:image/png;base64,' + this.icon + '"/>';
     }
 
-    html += data.text;
-    html += '</span>';
+    var msg =
+      this.showActionID || this.showDate || this.showThreadName || this.icon
+        ? ': ' + data.text
+        : data.text;
+    html += '<span style="color:' + data.color + '";>' + msg + '</span>';
+
+    html += '</div>';
     return html;
   },
 
@@ -290,6 +284,7 @@ logger = {
   },
 
   emit: function (event) {
+    if (!this.sendWebEvent) return;
     _web_interface_eval(
       "Api.Callback('custom-log', " + JSON.stringify(event) + ');'
     );
@@ -316,10 +311,11 @@ if (!Function.prototype.bind) {
     };
   };
 }
-
-logger_settings = logger.setDefaultSettings.bind(logger);
+logger.setDefaultSettings();
+logger_settings = logger.setSettings.bind(logger);
 logger_result = logger.result.bind(logger);
 logger_log = logger.log.bind(logger);
 logger_fail = logger.fail.bind(logger);
 logger_die = logger.die.bind(logger);
 logger_success = logger.success.bind(logger);
+logger_setLogPath = logger.setLogPath.bind(logger);
