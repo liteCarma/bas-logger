@@ -15,20 +15,18 @@ try {
   var code =
     loader.GetAdditionalData() +
     _.template($('#logger_settings_code').html())({
-      options: JSON.stringify({
-        error: error['original'],
-        info: info['original'],
-        warn: warn['original'],
-        lang: lang['original'],
-        icon: icon['original'],
-        threadName: threadName['original'],
+        error: error['updated'],
+        info: info['updated'],
+        warn: warn['updated'],
+        lang: lang['updated'],
+        icon: icon['updated'],
+        threadName: threadName['updated'],
         sendWebEvent: sendWebEvent,
         showWarnAlerts: showWarnAlerts,
         showThreadName: showThreadName,
         showActionID: showActionID,
         showDate: showDate,
-      }),
-    });
+      });
   code = Normalize(code, 0);
   BrowserAutomationStudio_Append(
     '',

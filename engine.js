@@ -203,7 +203,7 @@ logger = {
 
     if (this.icon) {
       html +=
-        '<span> </span><img src="data:image/png;base64,' + this.icon + '"/>';
+        '<span> </span><img src="data:image/png;base64,' + this.icon + '" width="16" heigth="16"/>';
     }
 
     var msg =
