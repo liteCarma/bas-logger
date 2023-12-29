@@ -70,15 +70,17 @@ logger = {
 
     this.emit(logData);
 
-    if (obj['formatAsLog'] === 'true') {
-      result_html(
-        this.getHTML(logData),
-        this.getText(logData),
-        logData.tab - 1
-      );
-    } else {
-      result(logData.text, logData.tab - 1);
+    var formatAsLog = obj['formatAsLog'].toString() == 'true'
+    if (!formatAsLog) {
+      logData.showThreadName = false
+      logData.showDate = false
+      logData.showActionID = false
+      logData.icon = ''
     }
+
+    var htmlLog = this.getHTML(logData)
+    var textLog = formatAsLog ? this.getText(logData) : logData.text
+    result_html( htmlLog, textLog, logData.tab - 1);
   },
 
   die: function (obj) {
@@ -183,34 +185,31 @@ logger = {
 
   getHTML: function (data) {
     var html = '<div>';
+      if (data.showActionID) {
+        html +=
+          '<a style="color:#808080;" href="action://action' +
+          data.action_id +
+          '">' +
+          this.formatId(data.action_id) +
+          '</a>';
+      }
 
-    if (this.showActionID) {
-      html +=
-        '<a style="color:#808080;" href="action://action' +
-        data.action_id +
-        '">' +
-        this.formatId(data.action_id) +
-        '</a>';
-    }
+      html += '<span style="color:' + data.color + '";>';
+      if (data.showDate) {
+        html += ' ' + this.getFormattedTime(data.date);
+      }
+      if (data.showThreadName) {
+        html += ' ' + data.thread_name + '</span>';
+      }
 
-    html += '<span style="color:' + data.color + '";>';
-    if (this.showDate) {
-      html += ' ' + this.getFormattedTime(data.date);
-    }
-    if (this.showThreadName) {
-      html += ' ' + data.thread_name + '</span>';
-    }
+      if (data.icon) {
+        html +=
+          '<span> </span><img src="data:image/png;base64,' + this.icon + '" width="16" heigth="16"/>';
+      }
 
-    if (this.icon) {
-      html +=
-        '<span> </span><img src="data:image/png;base64,' + this.icon + '" width="16" heigth="16"/>';
-    }
-
-    var msg =
-      this.showActionID || this.showDate || this.showThreadName || this.icon
-        ? ': ' + data.text
-        : data.text;
-    html += '<span style="color:' + data.color + '";>' + msg + '</span>';
+      var hasPrefix = data.showActionID || data.showDate || data.showThreadName || data.icon
+      var msg = hasPrefix ? ': ' + data.text : data.text;
+      html += '<span style="color:' + data.color + '";>' + msg + '</span>';
 
     html += '</div>';
     return html;
