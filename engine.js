@@ -208,7 +208,7 @@ logger = {
       }
 
       var hasPrefix = data.showActionID || data.showDate || data.showThreadName || data.icon
-      var msg = hasPrefix ? ': ' + data.text : data.text;
+      var msg = hasPrefix ? ' : ' + data.text : data.text;
       html += '<span style="color:' + data.color + '";>' + msg + '</span>';
 
     html += '</div>';
