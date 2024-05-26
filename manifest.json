@@ -132,9 +132,7 @@
   "developer_name": "userTrue",
   "developer_site": "",
   "embeddeddata": [],
-  "engine": [
-    "engine.js"
-  ],
+  "engine": ["engine.js"],
   "icon": "icon.png",
   "info": {
     "en": "Improved logger with multilingual support, the ability to specify the color for different levels of the log. To work with the web interface, the logger generates log events in JSON format. Also added improved \"Result\" action with output format similar to \" Log \" action.",
@@ -244,7 +242,7 @@
     }
   },
   "major_version": 4,
-  "minor_version": 1,
+  "minor_version": 2,
   "modules": [],
   "name": "logger"
 }

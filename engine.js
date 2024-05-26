@@ -8,43 +8,43 @@ logger = {
   _SetFailMessageOrig: ScriptWorker.SetFailMessage,
   _InfoOrig: ScriptWorker.Info,
   setDefaultSettings: function () {
-    this.lang = _K;
-    this.icon = '';
-    (this.levelColor = {
+    this.lang = _K
+    this.icon = ''
+    ;(this.levelColor = {
       info: '',
       error: '#FF0000',
       warn: '#909399',
     }),
       (this.threadName =
-        (_K === 'ru' ? 'Поток №' : 'Thread #') + thread_number());
-    this.sendWebEvent = false;
-    this.showWarnAlerts = true;
-    this.showThreadName = true;
-    this.showDate = true;
-    this.showActionID = true;
-    this.lastId = null;
+        (_K === 'ru' ? 'Поток №' : 'Thread #') + thread_number())
+    this.sendWebEvent = false
+    this.showWarnAlerts = true
+    this.showThreadName = true
+    this.showDate = true
+    this.showActionID = true
+    this.lastId = null
   },
   setSettings: function (options) {
-    this.setDefaultSettings();
-    var lang = options.lang.toLowerCase();
+    this.setDefaultSettings()
+    var lang = options.lang.toLowerCase()
 
     if (lang !== 'auto') {
-      this.lang = lang;
+      this.lang = lang
     }
 
-    this.icon = options.icon;
-    this.sendWebEvent = options.sendWebEvent;
-    this.showWarnAlerts = options.showWarnAlerts;
-    this.showThreadName = options.showThreadName;
-    this.showActionID = options.showActionID;
-    this.showDate = options.showDate;
+    this.icon = options.icon
+    this.sendWebEvent = options.sendWebEvent
+    this.showWarnAlerts = options.showWarnAlerts
+    this.showThreadName = options.showThreadName
+    this.showActionID = options.showActionID
+    this.showDate = options.showDate
 
     if (options.threadName !== '') {
-      this.threadName = options.threadName;
+      this.threadName = options.threadName
     }
 
-    this.setLevelColor(options.color);
-    this.eventInterceptor();
+    this.setLevelColor(options.color)
+    this.eventInterceptor()
   },
 
   log: function (obj) {
@@ -54,11 +54,11 @@ logger = {
         obj['color'] !== ''
           ? this.getColorCode(obj['color'])
           : this.levelColor[obj['level']],
-    });
+    })
 
-    this.emit(logData);
+    this.emit(logData)
 
-    log_html(this.getHTML(logData), this.getText(logData));
+    log_html(this.getHTML(logData), this.getText(logData))
   },
 
   result: function (obj) {
@@ -66,9 +66,9 @@ logger = {
       level: 'result',
       color: this.getColorCode(obj['color']),
       tab: obj['number'] || 1,
-    });
+    })
 
-    this.emit(logData);
+    this.emit(logData)
 
     var formatAsLog = obj['formatAsLog'].toString() == 'true'
     if (!formatAsLog) {
@@ -80,45 +80,45 @@ logger = {
 
     var htmlLog = this.getHTML(logData)
     var textLog = formatAsLog ? this.getText(logData) : logData.text
-    result_html( htmlLog, textLog, logData.tab - 1);
+    result_html(htmlLog, textLog, logData.tab - 1)
   },
 
   die: function (obj) {
     var logData = new this.CreateLogData(obj, {
       level: 'die',
       color: '#d90000',
-    });
+    })
 
-    ScriptWorker.Die(logData.text, obj['instantly'], logData);
+    ScriptWorker.Die(logData.text, obj['instantly'], logData)
   },
 
   fail: function (obj) {
     var logData = new this.CreateLogData(obj, {
       level: 'fail',
       color: '#d90000',
-    });
+    })
 
-    ScriptWorker.FailUser(logData.text, obj['stop'], logData);
+    ScriptWorker.FailUser(logData.text, obj['stop'], logData)
   },
 
   success: function (obj) {
     var logData = new this.CreateLogData(obj, {
       level: 'success',
       color: '#00dd2d',
-    });
-    ScriptWorker.Success(logData.text, logData);
+    })
+    ScriptWorker.Success(logData.text, logData)
   },
   setLogPath: function (obj) {
-    if (obj.logFile === '') return;
-    var path = obj.logFile === 'null' ? null : obj.logFile;
-    Logger.SetFileName(path);
+    if (obj.logFile === '') return
+    var path = obj.logFile === 'null' ? null : obj.logFile
+    Logger.SetFileName(path)
   },
   eventInterceptor: function () {
-    var self = this;
+    var self = this
     var wrapper = function (context, method, level) {
       return function () {
-        var message = arguments[0];
-        var logData = arguments[arguments.length - 1];
+        var message = arguments[0]
+        var logData = arguments[arguments.length - 1]
         if (!(logData instanceof self.CreateLogData)) {
           logData = new self.CreateLogData(
             {
@@ -128,193 +128,193 @@ logger = {
             {
               level: level,
             }
-          );
+          )
         }
 
         if (!self.showWarnAlerts && method === '_InfoOrig') {
-          return;
+          return
         }
 
-        self.emit(logData);
-        self[method].apply(context, arguments);
-      };
-    };
+        self.emit(logData)
+        self[method].apply(context, arguments)
+      }
+    }
 
-    ScriptWorker.Success = wrapper(ScriptWorker, '_SuccessOrig', 'success');
-    ScriptWorker.Fail = wrapper(ScriptWorker, '_FaillOrig', 'fail');
+    ScriptWorker.Success = wrapper(ScriptWorker, '_SuccessOrig', 'success')
+    ScriptWorker.Fail = wrapper(ScriptWorker, '_FaillOrig', 'fail')
     ScriptWorker.FailInternal = wrapper(
       ScriptWorker,
       '_FailInternalOrig',
       'fail'
-    );
-    ScriptWorker.FailUser = wrapper(ScriptWorker, '_FailUserOrig', 'fail');
-    ScriptWorker.Die = wrapper(ScriptWorker, '_DieOrig', 'fail');
-    ScriptWorker.DieInternal = wrapper(
-      ScriptWorker,
-      '_DieInternalOrig',
-      'fail'
-    );
+    )
+    ScriptWorker.FailUser = wrapper(ScriptWorker, '_FailUserOrig', 'fail')
+    ScriptWorker.Die = wrapper(ScriptWorker, '_DieOrig', 'fail')
+    ScriptWorker.DieInternal = wrapper(ScriptWorker, '_DieInternalOrig', 'fail')
     ScriptWorker.SetFailMessage = wrapper(
       ScriptWorker,
       '_SetFailMessageOrig',
       'fail'
-    );
-    ScriptWorker.Info = wrapper(ScriptWorker, '_InfoOrig', 'bas_warn');
+    )
+    ScriptWorker.Info = wrapper(ScriptWorker, '_InfoOrig', 'bas_warn')
   },
 
   CreateLogData: function (data, options) {
-    this.thread_name = logger.threadName;
-    this.action_id = ScriptWorker.GetCurrentAction();
-    this.date = new Date();
-    this.text = data[logger.lang];
-    this.lang = logger.lang;
-    this.ru = data.ru;
-    this.en = data.en;
-    this.icon = logger.icon;
-    this.showWarnAlerts = logger.showWarnAlerts;
-    this.showThreadName = logger.showThreadName;
-    this.showDate = logger.showDate;
-    this.showActionID = logger.showActionID;
+    this.thread_name = logger.threadName
+    this.action_id = ScriptWorker.GetCurrentAction()
+    this.date = new Date()
+    this.text = data[logger.lang] || data.ru || data.en
+    this.lang = logger.lang
+    this.ru = data.ru
+    this.en = data.en
+    this.icon = logger.icon
+    this.showWarnAlerts = logger.showWarnAlerts
+    this.showThreadName = logger.showThreadName
+    this.showDate = logger.showDate
+    this.showActionID = logger.showActionID
 
     for (key in options) {
       if (options.hasOwnProperty(key)) {
-        this[key] = options[key];
+        this[key] = options[key]
       }
     }
   },
 
   getHTML: function (data) {
-    var html = '<div>';
-      if (data.showActionID) {
-        html +=
-          '<a style="color:#808080;" href="action://action' +
-          data.action_id +
-          '">' +
-          this.formatId(data.action_id) +
-          '</a>';
-      }
+    var html = '<div>'
+    if (data.showActionID) {
+      html +=
+        '<a style="color:#808080;"' +
+        (ScriptWorker.GetIsRecord() ? ' href="action://action' : '') +
+        data.action_id +
+        '">' +
+        this.formatId(data.action_id) +
+        '</a>'
+    }
 
-      html += '<span style="color:' + data.color + '";>';
-      if (data.showDate) {
-        html += ' ' + this.getFormattedTime(data.date);
-      }
-      if (data.showThreadName) {
-        html += ' ' + data.thread_name + '</span>';
-      }
+    html += '<span style="color:' + data.color + '";>'
+    if (data.showDate) {
+      html += ' ' + this.getFormattedTime(data.date)
+    }
+    if (data.showThreadName) {
+      html += ' ' + data.thread_name + '</span>'
+    }
 
-      if (data.icon) {
-        html +=
-          '<span> </span><img src="data:image/png;base64,' + this.icon + '" width="16" heigth="16"/>';
-      }
+    if (data.icon) {
+      html +=
+        '<span> </span><img src="data:image/png;base64,' +
+        this.icon +
+        '" width="16" heigth="16"/>'
+    }
 
-      var hasPrefix = data.showActionID || data.showDate || data.showThreadName || data.icon
-      var msg = hasPrefix ? ' : ' + data.text : data.text;
-      html += '<span style="color:' + data.color + '";>' + msg + '</span>';
+    var hasPrefix =
+      data.showActionID || data.showDate || data.showThreadName || data.icon
+    var msg = hasPrefix ? ' : ' + data.text : data.text
+    html += '<span style="color:' + data.color + '";>' + msg + '</span>'
 
-    html += '</div>';
-    return html;
+    html += '</div>'
+    return html
   },
 
   getText: function (data) {
-    var text = '';
-    text += this.formatId(data.action_id);
-    text += this.getFormattedTime(data.date);
-    return text + ' ' + data.thread_name + ': ' + data.text;
+    var text = ''
+    text += this.formatId(data.action_id)
+    text += this.getFormattedTime(data.date)
+    return text + ' ' + data.thread_name + ': ' + data.text
   },
 
   setLevelColor: function (colors) {
     for (key in colors) {
-      this.levelColor[key] = this.getColorCode(colors[key].toLowerCase());
+      this.levelColor[key] = this.getColorCode(colors[key].toLowerCase())
     }
   },
 
   getColorCode: function (colorName) {
-    var value = colorName;
+    var value = colorName
     switch (colorName) {
       case 'red': {
-        value = '#FF0000';
-        break;
+        value = '#FF0000'
+        break
       }
       case 'orange': {
-        value = '#ffa500';
-        break;
+        value = '#ffa500'
+        break
       }
       case 'yellow': {
-        value = '#FFFF00';
-        break;
+        value = '#FFFF00'
+        break
       }
       case 'green': {
-        value = '#7CFC00';
-        break;
+        value = '#7CFC00'
+        break
       }
       case 'cyan': {
-        value = '#00FFFF';
-        break;
+        value = '#00FFFF'
+        break
       }
       case 'blue': {
-        value = '#1E90FF';
-        break;
+        value = '#1E90FF'
+        break
       }
       case 'white': {
-        value = '#FFF';
-        break;
+        value = '#FFF'
+        break
       }
       case 'gray': {
-        value = '#909399';
-        break;
+        value = '#909399'
+        break
       }
       case 'black': {
-        value = '#000';
-        break;
+        value = '#000'
+        break
       }
     }
 
-    return value;
+    return value
   },
 
   formatId: function (id) {
-    var s = '';
-    var needS = 9 - id.toString().length;
+    var s = ''
+    var needS = 9 - id.toString().length
 
     for (i = 0; i < needS; i++) {
-      s += '_';
+      s += '_'
     }
-    return s + '[' + id + ']';
+    return s + '[' + id + ']'
   },
 
   emit: function (event) {
-    if (!this.sendWebEvent) return;
+    if (!this.sendWebEvent) return
     _web_interface_eval(
       "Api.Callback('custom-log', " + JSON.stringify(event) + ');'
-    );
+    )
   },
 
   getFormattedTime: function (date) {
-    var h = date.getHours();
-    var m = date.getMinutes();
-    var s = date.getSeconds();
-    if (h < 10) h = '0' + h;
-    if (m < 10) m = '0' + m;
-    if (s < 10) s = '0' + s;
-    return '[' + h + ':' + m + ':' + s + ']';
+    var h = date.getHours()
+    var m = date.getMinutes()
+    var s = date.getSeconds()
+    if (h < 10) h = '0' + h
+    if (m < 10) m = '0' + m
+    if (s < 10) s = '0' + s
+    return '[' + h + ':' + m + ':' + s + ']'
   },
-};
+}
 
 if (!Function.prototype.bind) {
   Function.prototype.bind = function (context) {
-    var savfn = this;
-    var savArg = Array.prototype.slice.call(arguments, 1);
+    var savfn = this
+    var savArg = Array.prototype.slice.call(arguments, 1)
     return function () {
-      var arg = Array.prototype.slice.call(arguments);
-      return savfn.apply(context, savArg.concat(arg));
-    };
-  };
+      var arg = Array.prototype.slice.call(arguments)
+      return savfn.apply(context, savArg.concat(arg))
+    }
+  }
 }
-logger.setDefaultSettings();
-logger_settings = logger.setSettings.bind(logger);
-logger_result = logger.result.bind(logger);
-logger_log = logger.log.bind(logger);
-logger_fail = logger.fail.bind(logger);
-logger_die = logger.die.bind(logger);
-logger_success = logger.success.bind(logger);
-logger_setLogPath = logger.setLogPath.bind(logger);
+logger.setDefaultSettings()
+logger_settings = logger.setSettings.bind(logger)
+logger_result = logger.result.bind(logger)
+logger_log = logger.log.bind(logger)
+logger_fail = logger.fail.bind(logger)
+logger_die = logger.die.bind(logger)
+logger_success = logger.success.bind(logger)
+logger_setLogPath = logger.setLogPath.bind(logger)
